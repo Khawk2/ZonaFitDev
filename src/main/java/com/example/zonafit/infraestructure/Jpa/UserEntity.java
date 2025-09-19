@@ -1,11 +1,19 @@
-package com.example.zonafit.domain.model;
+package com.example.zonafit.infraestructure.Jpa;
 
+import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "cliente")
 @Data
-public class User {
+public class UserEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCliente;
+
     private String nombre;
     private String apellido;
     private String tipoDocumento;
