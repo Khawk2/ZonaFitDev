@@ -17,14 +17,17 @@ import java.time.LocalDate;
 public class Payment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private float amount;
     private LocalDate paymentDate;
+
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", referencedColumnName = "idUser")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 
