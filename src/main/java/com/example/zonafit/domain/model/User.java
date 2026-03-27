@@ -4,20 +4,18 @@ import com.example.zonafit.infraestructure.controller.utils.DocumentType;
 import com.example.zonafit.infraestructure.controller.utils.Role;
 import com.example.zonafit.infraestructure.controller.utils.StatusUser;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "users")
-@Data
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "usuario")
 public class User {
     
     @Id
@@ -66,6 +64,13 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Membership> memberships;
+
+    @OneToMany(mappedBy = "user")
+    private List<Payment> payments;
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

@@ -3,24 +3,24 @@ package com.example.zonafit.domain.model;
 
 import com.example.zonafit.infraestructure.controller.utils.PaymentMethod;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Table(name="payments")
+@Getter @Setter
+@Builder
+@Table(name="pago")
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private float amount;
+    private BigDecimal amount;
     private LocalDate paymentDate;
 
     @Enumerated(EnumType.STRING)
@@ -29,6 +29,11 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "membership_id", nullable = false)
+    private Membership membership;
+
 
 
 }

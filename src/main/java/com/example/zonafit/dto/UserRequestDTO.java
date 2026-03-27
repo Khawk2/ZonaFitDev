@@ -1,7 +1,9 @@
 package com.example.zonafit.dto;
 
 import com.example.zonafit.infraestructure.controller.utils.DocumentType;
+import com.example.zonafit.infraestructure.controller.utils.PaymentMethod;
 import com.example.zonafit.infraestructure.controller.utils.Role;
+import com.example.zonafit.infraestructure.controller.utils.TypeMembership;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,4 +53,10 @@ public class UserRequestDTO {
     
     @NotNull(message = "Role is required")
     private Role role;
+    
+    @NotNull(message = "Membership type is required")
+    private TypeMembership membershipType;
+    
+    @NotNull(message = "Payment method is required")
+    private PaymentMethod paymentMethod;
 }

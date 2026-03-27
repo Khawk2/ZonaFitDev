@@ -1,11 +1,13 @@
 package com.example.zonafit.service;
 
 import com.example.zonafit.domain.model.User;
+import com.example.zonafit.dto.MembershipPurchaseDTO;
 import com.example.zonafit.dto.UserRequestDTO;
 import com.example.zonafit.dto.UserResponseDTO;
 import com.example.zonafit.dto.UserUpdateDTO;
-import com.example.zonafit.infraestructure.repository.UserRepository;
+import com.example.zonafit.infraestructure.Repository.UserRepository;
 import com.example.zonafit.mapper.UserMapper;
+import com.example.zonafit.service.MembershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final MembershipService membershipService;
     
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
         // Validar que no existan usuarios con el mismo username, email o documentNumber
@@ -37,7 +40,21 @@ public class UserService {
         
         User user = userMapper.toEntity(userRequestDTO);
         User savedUser = userRepository.save(user);
-        return userMapper.toResponseDTO(savedUser);
+        
+        // Crear membresía automáticamente para el nuevo usuario
+        MembershipPurchaseDTO membershipPurchase = new MembershipPurchaseDTO(
+                savedUser.getId(),
+                userRequestDTO.getMembershipType(),
+                userRequestDTO.getPaymentMethod()
+        );
+        
+        membershipService.purchaseMembership(membershipPurchase);
+        
+        // Recargar el usuario con la membresía
+        User userWithMembership = userRepository.findById(savedUser.getId())
+                .orElseThrow(() -> new RuntimeException("Error al cargar el usuario con membresía"));
+        
+        return userMapper.toResponseDTO(userWithMembership);
     }
     
     @Transactional(readOnly = true)

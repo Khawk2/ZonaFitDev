@@ -1,14 +1,22 @@
 package com.example.zonafit.mapper;
 
 import com.example.zonafit.domain.model.User;
+import com.example.zonafit.dto.MembershipResponseDTO;
 import com.example.zonafit.dto.UserRequestDTO;
 import com.example.zonafit.dto.UserResponseDTO;
 import com.example.zonafit.dto.UserUpdateDTO;
 import com.example.zonafit.infraestructure.controller.utils.StatusUser;
+import com.example.zonafit.mapper.MembershipMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
+    
+    private final MembershipMapper membershipMapper;
+    
+    public UserMapper(MembershipMapper membershipMapper) {
+        this.membershipMapper = membershipMapper;
+    }
     
     public User toEntity(UserRequestDTO dto) {
         return User.builder()
@@ -27,10 +35,26 @@ public class UserMapper {
     }
     
     public UserResponseDTO toResponseDTO(User user) {
+        MembershipResponseDTO membershipDTO = null;
+        if (user.getMembership() != null) {
+            membershipDTO = membershipMapper.toResponseDTO(user.getMembership());
+        }
+        
         return new UserResponseDTO(
                 user.getId(),
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPhoneNumber(),
+                user.getDocumentType(),
+                user.getDocumentNumber(),
+                user.getBirthDate(),
+                user.getRole(),
+                user.getStatus(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                membershipDTO
         );
     }
     

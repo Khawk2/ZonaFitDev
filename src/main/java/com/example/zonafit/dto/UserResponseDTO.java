@@ -10,7 +10,17 @@ import java.time.LocalDateTime;
 public record UserResponseDTO(
     Long id,
     String username,
-    String email
-
+    String email,
+    String firstName,
+    String lastName,
+    String phoneNumber,
+    DocumentType documentType,
+    String documentNumber,
+    LocalDate birthDate,
+    Role role,
+    StatusUser status,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    MembershipResponseDTO membership
 ) {
 }
