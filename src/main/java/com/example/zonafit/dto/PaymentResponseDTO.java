@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 public record PaymentResponseDTO(
         Long id,
-        Double amount,
+        java.math.BigDecimal amount,
         LocalDate paymentDate,
         PaymentMethod paymentMethod,
         Long userId,
