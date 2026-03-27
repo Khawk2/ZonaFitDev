@@ -67,6 +67,7 @@ public class MembershipService {
                 .build();
 
         Membership savedMembership = membershipRepository.save(membership);
+<<<<<<< HEAD:src/main/java/com/example/zonafit/application/userservice/impl/MembershipService.java
 
         Payment payment = Payment.builder()
                 .amount(BigDecimal.valueOf(price))
@@ -76,6 +77,17 @@ public class MembershipService {
                 .membership(savedMembership)
                 .build();
 
+=======
+        
+        // Crear el pago
+        Payment payment = new Payment();
+        payment.setAmount(BigDecimal.valueOf(price));
+        payment.setPaymentDate(LocalDate.now());
+        payment.setPaymentMethod(purchaseDTO.paymentMethod());
+        payment.setUser(user);
+        payment.setMembership(savedMembership);
+        
+>>>>>>> 4a10af788b97fca7af911fa6cb25e3483c64bfd1:src/main/java/com/example/zonafit/service/MembershipService.java
         paymentRepository.save(payment);
 
         return membershipMapper.toResponseDTO(savedMembership);
