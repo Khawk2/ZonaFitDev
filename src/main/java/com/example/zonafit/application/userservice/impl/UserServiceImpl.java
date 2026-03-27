@@ -1,13 +1,13 @@
-package com.example.zonafit.service;
+package com.example.zonafit.application.userservice.impl;
 
+import com.example.zonafit.application.userservice.IUserService;
 import com.example.zonafit.domain.model.User;
 import com.example.zonafit.dto.MembershipPurchaseDTO;
 import com.example.zonafit.dto.UserRequestDTO;
 import com.example.zonafit.dto.UserResponseDTO;
 import com.example.zonafit.dto.UserUpdateDTO;
-import com.example.zonafit.infraestructure.Repository.UserRepository;
+import com.example.zonafit.infraestructure.repository.UserRepository;
 import com.example.zonafit.mapper.UserMapper;
-import com.example.zonafit.service.MembershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserService {
+public class UserServiceImpl implements IUserService {
     
     private final UserRepository userRepository;
     private final UserMapper userMapper;

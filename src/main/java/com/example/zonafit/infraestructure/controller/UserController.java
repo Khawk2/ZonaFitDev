@@ -3,7 +3,7 @@ package com.example.zonafit.infraestructure.controller;
 import com.example.zonafit.dto.UserRequestDTO;
 import com.example.zonafit.dto.UserResponseDTO;
 import com.example.zonafit.dto.UserUpdateDTO;
-import com.example.zonafit.service.UserService;
+import com.example.zonafit.application.userservice.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @PostMapping("/create")
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {

@@ -1,4 +1,4 @@
-package com.example.zonafit.infraestructure.Repository;
+package com.example.zonafit.infraestructure.repository;
 
 import com.example.zonafit.domain.model.User;
 

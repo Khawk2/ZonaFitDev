@@ -3,7 +3,7 @@ package com.example.zonafit.infraestructure.controller;
 import com.example.zonafit.dto.MembershipPurchaseDTO;
 import com.example.zonafit.dto.MembershipResponseDTO;
 import com.example.zonafit.dto.PaymentResponseDTO;
-import com.example.zonafit.service.MembershipService;
+import com.example.zonafit.application.userservice.impl.MembershipService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
