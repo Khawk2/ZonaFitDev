@@ -1,4 +1,4 @@
-package com.example.zonafit.service;
+package com.example.zonafit.application.userservice.impl;
 
 import com.example.zonafit.domain.model.Membership;
 import com.example.zonafit.domain.model.Payment;
@@ -6,9 +6,11 @@ import com.example.zonafit.domain.model.User;
 import com.example.zonafit.dto.MembershipPurchaseDTO;
 import com.example.zonafit.dto.MembershipResponseDTO;
 import com.example.zonafit.dto.PaymentResponseDTO;
-import com.example.zonafit.infraestructure.Repository.MembershipRepositoryPort;
-import com.example.zonafit.infraestructure.Repository.PaymentRepositoryPort;
-import com.example.zonafit.infraestructure.Repository.UserRepository;
+import com.example.zonafit.globalExceptionHandler.BusinessException;
+import com.example.zonafit.globalExceptionHandler.ResourceNotFoundException;
+import com.example.zonafit.infraestructure.repository.MembershipRepositoryPort;
+import com.example.zonafit.infraestructure.repository.PaymentRepositoryPort;
+import com.example.zonafit.infraestructure.repository.UserRepository;
 import com.example.zonafit.infraestructure.controller.utils.StatusMembership;
 import com.example.zonafit.mapper.MembershipMapper;
 import com.example.zonafit.mapper.PaymentMapper;
@@ -37,49 +39,48 @@ public class MembershipService {
     private static final double QUARTERLY_PRICE = 216000.0; // 10% descuento
     private static final double YEARLY_PRICE = 768000.0; // 20% descuento
     private static final double VIP_PRICE = 100000.0;
-    
+
+    @Transactional
     public MembershipResponseDTO purchaseMembership(MembershipPurchaseDTO purchaseDTO) {
-        // Verificar que el usuario existe
+
         User user = userRepository.findById(purchaseDTO.userId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + purchaseDTO.userId()));
-        
-        // Verificar que el usuario no tenga ya una membresía activa
-        if (membershipRepository.findByUserId(purchaseDTO.userId()).isPresent()) {
-            throw new RuntimeException("El usuario ya tiene una membresía activa");
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Usuario no encontrado con ID: " + purchaseDTO.userId()));
+
+        if (membershipRepository.existsByUserIdAndStatus(
+                purchaseDTO.userId(), StatusMembership.ACTIVE)) {
+            throw new BusinessException("El usuario ya tiene una membresía activa");
         }
-        
-        // Calcular precio según el tipo de membresía
+
         double price = calculatePrice(purchaseDTO.type());
-        
-        // Calcular fechas de inicio y fin
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = calculateEndDate(startDate, purchaseDTO.type());
-        
-        // Crear la membresía
+
+        LocalDate now = LocalDate.now();
+        LocalDate endDate = calculateEndDate(now, purchaseDTO.type());
+
         Membership membership = Membership.builder()
                 .type(purchaseDTO.type())
-                .startDate(startDate)
+                .startDate(now)
                 .endDate(endDate)
                 .status(StatusMembership.ACTIVE)
                 .price(price)
                 .user(user)
                 .build();
-        
+
         Membership savedMembership = membershipRepository.save(membership);
-        
-        // Crear el pago
-        Payment payment = new Payment();
-        payment.setAmount(BigDecimal.valueOf(price));
-        payment.setPaymentDate(LocalDate.now());
-        payment.setPaymentMethod(purchaseDTO.paymentMethod());
-        payment.setUser(user);
-        payment.setMembership(savedMembership);
-        
+
+        Payment payment = Payment.builder()
+                .amount(BigDecimal.valueOf(price))
+                .paymentDate(now)
+                .paymentMethod(purchaseDTO.paymentMethod())
+                .user(user)
+                .membership(savedMembership)
+                .build();
         paymentRepository.save(payment);
-        
+
         return membershipMapper.toResponseDTO(savedMembership);
     }
-    
+
+
     @Transactional(readOnly = true)
     public MembershipResponseDTO getMembershipByUserId(Long userId) {
         Membership membership = membershipRepository.findByUserId(userId)

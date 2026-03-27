@@ -4,6 +4,8 @@ import com.example.zonafit.domain.model.Payment;
 import com.example.zonafit.dto.PaymentResponseDTO;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class PaymentMapper {
 

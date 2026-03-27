@@ -1,6 +1,7 @@
-package com.example.zonafit.infraestructure.Repository;
+package com.example.zonafit.infraestructure.repository;
 
 import com.example.zonafit.domain.model.Membership;
+import com.example.zonafit.infraestructure.controller.utils.StatusMembership;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +27,12 @@ public class MembershipRepository implements MembershipRepositoryPort {
     public Optional<Membership> findByUserId(Long userId) {
         return membershipJpaRepository.findByUserId(userId);
     }
-    
+
+    @Override
+    public boolean existsByUserIdAndStatus(Long userId, StatusMembership status) {
+        return false;
+    }
+
     @Override
     public void deleteById(Long id) {
         membershipJpaRepository.deleteById(id);
