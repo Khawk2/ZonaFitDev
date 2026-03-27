@@ -1,5 +1,6 @@
 package com.example.zonafit.mapper;
 
+import com.example.zonafit.domain.model.Membership;
 import com.example.zonafit.domain.model.User;
 import com.example.zonafit.dto.MembershipResponseDTO;
 import com.example.zonafit.dto.UserRequestDTO;
@@ -36,8 +37,8 @@ public class UserMapper {
     
     public UserResponseDTO toResponseDTO(User user) {
         MembershipResponseDTO membershipDTO = null;
-        if (user.getMembership() != null) {
-            membershipDTO = membershipMapper.toResponseDTO(user.getMembership());
+        if (user.getMemberships() != null) {
+            membershipDTO = membershipMapper.toResponseDTO((Membership) user.getMemberships());
         }
         
         return new UserResponseDTO(
