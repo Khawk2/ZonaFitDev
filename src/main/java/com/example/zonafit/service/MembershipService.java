@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,7 +69,7 @@ public class MembershipService {
         
         // Crear el pago
         Payment payment = new Payment();
-        payment.setAmount((float) price);
+        payment.setAmount(BigDecimal.valueOf(price));
         payment.setPaymentDate(LocalDate.now());
         payment.setPaymentMethod(purchaseDTO.paymentMethod());
         payment.setUser(user);

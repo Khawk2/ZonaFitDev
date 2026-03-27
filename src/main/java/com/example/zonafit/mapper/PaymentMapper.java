@@ -6,15 +6,29 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PaymentMapper {
-    
+
     public PaymentResponseDTO toResponseDTO(Payment payment) {
+        if (payment == null) {
+            return null;
+        }
+
+        Long userId = null;
+        if (payment.getUser() != null) {
+            userId = payment.getUser().getId();
+        }
+
+        Long membershipId = null;
+        if (payment.getMembership() != null) {
+            membershipId = payment.getMembership().getId();
+        }
+
         return new PaymentResponseDTO(
                 payment.getId(),
-                (double) payment.getAmount(),
+                payment.getAmount(),
                 payment.getPaymentDate(),
                 payment.getPaymentMethod(),
-                payment.getUser().getId(),
-                payment.getMembership().getId()
+                userId,
+                membershipId
         );
     }
 }
