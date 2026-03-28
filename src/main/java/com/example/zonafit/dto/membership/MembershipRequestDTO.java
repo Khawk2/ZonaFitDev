@@ -1,9 +1,9 @@
-package com.example.zonafit.dto;
+package com.example.zonafit.dto.membership;
 
-import com.example.zonafit.infraestructure.controller.utils.TypeMembership;
+import com.example.zonafit.domain.enums.TypeMembership;
 import jakarta.validation.constraints.NotNull;
 
-public record MembershipRequesDTO(
+public record MembershipRequestDTO(
         @NotNull(message = "User ID is required")
         Long userId,
         

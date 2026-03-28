@@ -2,12 +2,11 @@ package com.example.zonafit.mapper;
 
 import com.example.zonafit.domain.model.Membership;
 import com.example.zonafit.domain.model.User;
-import com.example.zonafit.dto.MembershipResponseDTO;
-import com.example.zonafit.dto.UserRequestDTO;
-import com.example.zonafit.dto.UserResponseDTO;
-import com.example.zonafit.dto.UserUpdateDTO;
-import com.example.zonafit.infraestructure.controller.utils.StatusUser;
-import com.example.zonafit.mapper.MembershipMapper;
+import com.example.zonafit.dto.membership.MembershipResponseDTO;
+import com.example.zonafit.dto.user.UserRequestDTO;
+import com.example.zonafit.dto.user.UserResponseDTO;
+import com.example.zonafit.dto.user.UserUpdateDTO;
+import com.example.zonafit.domain.enums.StatusUser;
 import org.springframework.stereotype.Component;
 
 @Component

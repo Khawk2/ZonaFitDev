@@ -1,9 +1,10 @@
 package com.example.zonafit.infraestructure.controller;
 
-import com.example.zonafit.dto.MembershipPurchaseDTO;
-import com.example.zonafit.dto.MembershipResponseDTO;
-import com.example.zonafit.dto.PaymentResponseDTO;
-import com.example.zonafit.application.userservice.impl.MembershipService;
+import com.example.zonafit.application.membershipservice.IMembershipService;
+import com.example.zonafit.dto.membership.MembershipPurchaseDTO;
+import com.example.zonafit.dto.membership.MembershipResponseDTO;
+import com.example.zonafit.dto.payment.PaymentResponseDTO;
+import com.example.zonafit.application.membershipservice.impl.MembershipServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,46 +14,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/membership")
+@RequestMapping("/api/memberships")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class MembershipController {
 
-    private final MembershipService membershipService;
-    
-    @PostMapping("/purchase")
-    public ResponseEntity<MembershipResponseDTO> purchaseMembership(@Valid @RequestBody MembershipPurchaseDTO purchaseDTO) {
-        try {
-            MembershipResponseDTO membership = membershipService.purchaseMembership(purchaseDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(membership);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    private final IMembershipService membershipService;
+
+    @PostMapping
+    public ResponseEntity<MembershipResponseDTO> purchaseMembership(
+            @Valid @RequestBody MembershipPurchaseDTO purchaseDTO) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(membershipService.purchaseMembership(purchaseDTO));
     }
-    
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<MembershipResponseDTO> getMembershipByUserId(@PathVariable Long userId) {
-        try {
-            MembershipResponseDTO membership = membershipService.getMembershipByUserId(userId);
-            return ResponseEntity.ok(membership);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(membershipService.getMembershipByUserId(userId));
     }
-    
+
     @GetMapping("/user/{userId}/payments")
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByUserId(@PathVariable Long userId) {
-        List<PaymentResponseDTO> payments = membershipService.getPaymentsByUserId(userId);
-        return ResponseEntity.ok(payments);
+        return ResponseEntity.ok(membershipService.getPaymentsByUserId(userId));
     }
-    
+
     @PutMapping("/user/{userId}/cancel")
     public ResponseEntity<Void> cancelMembership(@PathVariable Long userId) {
-        try {
-            membershipService.cancelMembership(userId);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        membershipService.cancelMembership(userId);
+        return ResponseEntity.ok().build();
     }
 }

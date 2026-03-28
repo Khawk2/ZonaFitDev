@@ -1,4 +1,4 @@
-package com.example.zonafit.globalExceptionHandler;
+package com.example.zonafit.domain.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 

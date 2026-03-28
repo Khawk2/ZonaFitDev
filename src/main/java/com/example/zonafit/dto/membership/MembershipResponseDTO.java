@@ -1,7 +1,7 @@
-package com.example.zonafit.dto;
+package com.example.zonafit.dto.membership;
 
-import com.example.zonafit.infraestructure.controller.utils.StatusMembership;
-import com.example.zonafit.infraestructure.controller.utils.TypeMembership;
+import com.example.zonafit.domain.enums.StatusMembership;
+import com.example.zonafit.domain.enums.TypeMembership;
 
 import java.time.LocalDate;
 

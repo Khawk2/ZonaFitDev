@@ -1,7 +1,7 @@
 package com.example.zonafit.infraestructure.repository;
 
 import com.example.zonafit.domain.model.Membership;
-import com.example.zonafit.infraestructure.controller.utils.StatusMembership;
+import com.example.zonafit.domain.enums.StatusMembership;
 
 import java.util.Optional;
 

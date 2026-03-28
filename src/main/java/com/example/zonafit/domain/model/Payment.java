@@ -1,7 +1,7 @@
 package com.example.zonafit.domain.model;
 
 
-import com.example.zonafit.infraestructure.controller.utils.PaymentMethod;
+import com.example.zonafit.domain.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
