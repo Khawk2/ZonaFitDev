@@ -1,6 +1,6 @@
-package com.example.zonafit.dto;
+package com.example.zonafit.dto.payment;
 
-import com.example.zonafit.infraestructure.controller.utils.PaymentMethod;
+import com.example.zonafit.domain.enums.PaymentMethod;
 
 import java.time.LocalDate;
 

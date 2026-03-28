@@ -1,8 +1,9 @@
-package com.example.zonafit.dto;
+package com.example.zonafit.dto.user;
 
-import com.example.zonafit.infraestructure.controller.utils.DocumentType;
-import com.example.zonafit.infraestructure.controller.utils.Role;
-import com.example.zonafit.infraestructure.controller.utils.StatusUser;
+import com.example.zonafit.domain.enums.DocumentType;
+import com.example.zonafit.domain.enums.Role;
+import com.example.zonafit.domain.enums.StatusUser;
+import com.example.zonafit.dto.membership.MembershipResponseDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

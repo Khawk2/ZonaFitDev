@@ -1,7 +1,7 @@
 package com.example.zonafit.domain.model;
 
-import com.example.zonafit.infraestructure.controller.utils.StatusMembership;
-import com.example.zonafit.infraestructure.controller.utils.TypeMembership;
+import com.example.zonafit.domain.enums.StatusMembership;
+import com.example.zonafit.domain.enums.TypeMembership;
 import jakarta.persistence.*;
 import lombok.*;
 

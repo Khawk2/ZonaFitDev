@@ -1,11 +1,15 @@
 package com.example.zonafit.application.userservice.impl;
 
+import com.example.zonafit.application.membershipservice.IMembershipService;
 import com.example.zonafit.application.userservice.IUserService;
+import com.example.zonafit.domain.exception.BusinessException;
+import com.example.zonafit.domain.exception.ResourceNotFoundException;
 import com.example.zonafit.domain.model.User;
-import com.example.zonafit.dto.MembershipPurchaseDTO;
-import com.example.zonafit.dto.UserRequestDTO;
-import com.example.zonafit.dto.UserResponseDTO;
-import com.example.zonafit.dto.UserUpdateDTO;
+import com.example.zonafit.domain.validator.UserValidator;
+import com.example.zonafit.dto.membership.MembershipPurchaseDTO;
+import com.example.zonafit.dto.user.UserRequestDTO;
+import com.example.zonafit.dto.user.UserResponseDTO;
+import com.example.zonafit.dto.user.UserUpdateDTO;
 import com.example.zonafit.infraestructure.repository.UserRepository;
 import com.example.zonafit.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,20 +28,14 @@ public class UserServiceImpl implements IUserService {
     
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final MembershipService membershipService;
+    private final IMembershipService membershipService;
+    private final UserValidator userValidator;
     
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
+
         // Validar que no existan usuarios con el mismo username, email o documentNumber
-        if (userRepository.existsByUsername(userRequestDTO.getUsername())) {
-            throw new RuntimeException("Username already exists: " + userRequestDTO.getUsername());
-        }
-        if (userRepository.existsByEmail(userRequestDTO.getEmail())) {
-            throw new RuntimeException("Email already exists: " + userRequestDTO.getEmail());
-        }
-        if (userRepository.existsByDocumentNumber(userRequestDTO.getDocumentNumber())) {
-            throw new RuntimeException("Document number already exists: " + userRequestDTO.getDocumentNumber());
-        }
-        
+        userValidator.validateForCreate(userRequestDTO);
+
         User user = userMapper.toEntity(userRequestDTO);
         User savedUser = userRepository.save(user);
         
@@ -56,14 +54,14 @@ public class UserServiceImpl implements IUserService {
         
         return userMapper.toResponseDTO(userWithMembership);
     }
-    
+
     @Transactional(readOnly = true)
     public UserResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return userMapper.toResponseDTO(user);
     }
-    
+
     @Transactional(readOnly = true)
     public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll()
@@ -71,7 +69,7 @@ public class UserServiceImpl implements IUserService {
                 .map(userMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
-    
+
     @Transactional(readOnly = true)
     public Page<UserResponseDTO> getAllUsersPaginated(Pageable pageable) {
         return userRepository.findAll(pageable)
@@ -80,26 +78,10 @@ public class UserServiceImpl implements IUserService {
     
     public UserResponseDTO updateUser(Long id, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         
         // Validar unicidad si se están actualizando campos únicos
-        if (userUpdateDTO.getUsername() != null && 
-            !userUpdateDTO.getUsername().equals(user.getUsername()) &&
-            userRepository.existsByUsername(userUpdateDTO.getUsername())) {
-            throw new RuntimeException("Username already exists: " + userUpdateDTO.getUsername());
-        }
-        
-        if (userUpdateDTO.getEmail() != null && 
-            !userUpdateDTO.getEmail().equals(user.getEmail()) &&
-            userRepository.existsByEmail(userUpdateDTO.getEmail())) {
-            throw new RuntimeException("Email already exists: " + userUpdateDTO.getEmail());
-        }
-        
-        if (userUpdateDTO.getDocumentNumber() != null && 
-            !userUpdateDTO.getDocumentNumber().equals(user.getDocumentNumber()) &&
-            userRepository.existsByDocumentNumber(userUpdateDTO.getDocumentNumber())) {
-            throw new RuntimeException("Document number already exists: " + userUpdateDTO.getDocumentNumber());
-        }
+        userValidator.validateForUpdate(userUpdateDTO, user);
         
         userMapper.updateEntityFromDTO(userUpdateDTO, user);
         User updatedUser = userRepository.save(user);
@@ -112,14 +94,14 @@ public class UserServiceImpl implements IUserService {
         }
         userRepository.deleteById(id);
     }
-    
+
     @Transactional(readOnly = true)
     public UserResponseDTO getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
         return userMapper.toResponseDTO(user);
     }
-    
+
     @Transactional(readOnly = true)
     public UserResponseDTO getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)

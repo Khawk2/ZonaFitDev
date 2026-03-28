@@ -1,8 +1,8 @@
 package com.example.zonafit.domain.model;
 
-import com.example.zonafit.infraestructure.controller.utils.DocumentType;
-import com.example.zonafit.infraestructure.controller.utils.Role;
-import com.example.zonafit.infraestructure.controller.utils.StatusUser;
+import com.example.zonafit.domain.enums.DocumentType;
+import com.example.zonafit.domain.enums.Role;
+import com.example.zonafit.domain.enums.StatusUser;
 import jakarta.persistence.*;
 import lombok.*;
 

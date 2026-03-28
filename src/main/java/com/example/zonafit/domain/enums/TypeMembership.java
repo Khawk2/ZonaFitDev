@@ -1,4 +1,4 @@
-package com.example.zonafit.infraestructure.controller.utils;
+package com.example.zonafit.domain.enums;
 
 public enum TypeMembership {
     MONTHLY,

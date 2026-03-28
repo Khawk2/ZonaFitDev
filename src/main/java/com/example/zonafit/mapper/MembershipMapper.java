@@ -1,7 +1,7 @@
 package com.example.zonafit.mapper;
 
 import com.example.zonafit.domain.model.Membership;
-import com.example.zonafit.dto.MembershipResponseDTO;
+import com.example.zonafit.dto.membership.MembershipResponseDTO;
 import org.springframework.stereotype.Component;
 
 @Component
