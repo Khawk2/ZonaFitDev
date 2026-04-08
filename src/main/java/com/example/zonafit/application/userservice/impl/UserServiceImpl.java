@@ -2,7 +2,6 @@ package com.example.zonafit.application.userservice.impl;
 
 import com.example.zonafit.application.membershipservice.IMembershipService;
 import com.example.zonafit.application.userservice.IUserService;
-import com.example.zonafit.domain.exception.BusinessException;
 import com.example.zonafit.domain.exception.ResourceNotFoundException;
 import com.example.zonafit.domain.model.User;
 import com.example.zonafit.domain.validator.UserValidator;
@@ -13,99 +12,127 @@ import com.example.zonafit.dto.user.UserUpdateDTO;
 import com.example.zonafit.infraestructure.repository.UserRepository;
 import com.example.zonafit.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class UserServiceImpl implements IUserService {
-    
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final IMembershipService membershipService;
     private final UserValidator userValidator;
-    
-    public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
+    private final PasswordEncoder passwordEncoder;
 
-        // Validar que no existan usuarios con el mismo username, email o documentNumber
-        userValidator.validateForCreate(userRequestDTO);
+    @Override
+    public UserResponseDTO createUser(@NonNull UserRequestDTO dto) {
+        Assert.notNull(dto, "UserRequestDTO no puede ser nulo");
 
-        User user = userMapper.toEntity(userRequestDTO);
+        userValidator.validateForCreate(dto);
+
+        User user = userMapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         User savedUser = userRepository.save(user);
-        
-        // Crear membresía automáticamente para el nuevo usuario
-        MembershipPurchaseDTO membershipPurchase = new MembershipPurchaseDTO(
-                savedUser.getId(),
-                userRequestDTO.getMembershipType(),
-                userRequestDTO.getPaymentMethod()
-        );
-        
-        membershipService.purchaseMembership(membershipPurchase);
-        
-        // Recargar el usuario con la membresía
-        User userWithMembership = userRepository.findById(savedUser.getId())
-                .orElseThrow(() -> new RuntimeException("Error al cargar el usuario con membresía"));
-        
-        return userMapper.toResponseDTO(userWithMembership);
+
+        createMembershipForUser(savedUser, dto);
+
+        return userMapper.toResponseDTO(savedUser);
     }
 
+    private void createMembershipForUser(@NonNull User user, @NonNull UserRequestDTO dto) {
+        Assert.notNull(user.getId(), "User ID no puede ser nulo después de guardar");
+
+        try {
+            MembershipPurchaseDTO membership = new MembershipPurchaseDTO(
+                    user.getId(),
+                    dto.getMembershipType(),
+                    dto.getPaymentMethod()
+            );
+
+            membershipService.purchaseMembership(membership);
+            log.info("Membresía creada exitosamente para usuario: {}", user.getId());
+        } catch (Exception ex) {
+            log.warn("No se pudo crear membresía para usuario {}: {}", user.getId(), ex.getMessage());
+            // No fallar el registro del usuario si la membresía falla
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public UserResponseDTO getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        return userMapper.toResponseDTO(user);
+    public UserResponseDTO getUserById(@NonNull Long id) {
+        Assert.notNull(id, "ID no puede ser nulo");
+        return userRepository.findById(id)
+                .map(userMapper::toResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(userMapper::toResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Override
     public Page<UserResponseDTO> getAllUsersPaginated(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(userMapper::toResponseDTO);
     }
-    
-    public UserResponseDTO updateUser(Long id, UserUpdateDTO userUpdateDTO) {
+
+    @Override
+    public UserResponseDTO updateUser(@NonNull Long id, @NonNull UserUpdateDTO dto) {
+        Assert.notNull(id, "ID no puede ser nulo");
+        Assert.notNull(dto, "UserUpdateDTO no puede ser nulo");
+
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        
-        // Validar unicidad si se están actualizando campos únicos
-        userValidator.validateForUpdate(userUpdateDTO, user);
-        
-        userMapper.updateEntityFromDTO(userUpdateDTO, user);
-        User updatedUser = userRepository.save(user);
-        return userMapper.toResponseDTO(updatedUser);
-    }
-    
-    public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
-        }
-        userRepository.deleteById(id);
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
+
+        userValidator.validateForUpdate(dto, user);
+
+        userMapper.updateEntityFromDTO(dto, user);
+
+        User savedUser = userRepository.save(user);
+        Assert.notNull(savedUser, "Usuario guardado no puede ser nulo");
+        return userMapper.toResponseDTO(savedUser);
     }
 
-    @Transactional(readOnly = true)
-    public UserResponseDTO getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
-        return userMapper.toResponseDTO(user);
+    @Override
+    public void deleteUser(@NonNull Long id) {
+        Assert.notNull(id, "ID no puede ser nulo");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
+        userRepository.delete(user);
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public UserResponseDTO getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-        return userMapper.toResponseDTO(user);
+    public UserResponseDTO getUserByUsername(@NonNull String username) {
+        Assert.hasText(username, "Username no puede ser nulo o vacío");
+        return userRepository.findByUsername(username)
+                .map(userMapper::toResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con username: " + username));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserResponseDTO getUserByEmail(@NonNull String email) {
+        Assert.hasText(email, "Email no puede ser nulo o vacío");
+        return userRepository.findByEmail(email)
+                .map(userMapper::toResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
     }
 }

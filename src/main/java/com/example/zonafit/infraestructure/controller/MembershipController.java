@@ -4,7 +4,6 @@ import com.example.zonafit.application.membershipservice.IMembershipService;
 import com.example.zonafit.dto.membership.MembershipPurchaseDTO;
 import com.example.zonafit.dto.membership.MembershipResponseDTO;
 import com.example.zonafit.dto.payment.PaymentResponseDTO;
-import com.example.zonafit.application.membershipservice.impl.MembershipServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/memberships")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class MembershipController {
 
     private final IMembershipService membershipService;

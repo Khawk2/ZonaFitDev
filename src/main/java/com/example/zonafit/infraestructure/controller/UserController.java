@@ -4,11 +4,11 @@ import com.example.zonafit.application.userservice.IUserService;
 import com.example.zonafit.dto.user.UserRequestDTO;
 import com.example.zonafit.dto.user.UserResponseDTO;
 import com.example.zonafit.dto.user.UserUpdateDTO;
-import com.example.zonafit.application.userservice.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +22,13 @@ public class UserController {
     private final IUserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody @NonNull UserRequestDTO userRequestDTO) {
         UserResponseDTO createdUser = userService.createUser(userRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
@@ -39,20 +39,20 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
-            @PathVariable Long id,
-            @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+            @PathVariable @NonNull Long id,
+            @Valid @RequestBody @NonNull UserUpdateDTO userUpdateDTO) {
 
         return ResponseEntity.ok(userService.updateUser(id, userUpdateDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable @NonNull Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<UserResponseDTO> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserResponseDTO> getUserByUsername(@PathVariable @NonNull String username) {
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 }
