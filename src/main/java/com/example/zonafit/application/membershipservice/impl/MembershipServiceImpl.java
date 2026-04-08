@@ -95,11 +95,13 @@ public class MembershipServiceImpl implements IMembershipService {
     
     public void cancelMembership(Long userId) {
         Membership membership = membershipRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("No se encontró membresía para el usuario con ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró membresía para el usuario con ID: " + userId));
 
         if (membership.getStatus() == StatusMembership.INACTIVE) {
             throw new BusinessException("La membresía ya está cancelada");
         }
+        
+        membership.setStatus(StatusMembership.INACTIVE);
         membershipRepository.save(membership);
     }
     
